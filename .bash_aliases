@@ -1,5 +1,5 @@
 # Plate aliases
-alias dc='docker-compose'
+alias dc='docker compose'
 alias dcr='dc run --rm'
 alias plateserver='dcr --service-ports app'
 
