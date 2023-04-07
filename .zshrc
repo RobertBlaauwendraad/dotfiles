@@ -116,3 +116,6 @@ fi
 
 # Added by Toolbox App
 export PATH="$PATH:/home/robert/.local/share/JetBrains/Toolbox/scripts"
+
+# rbenv
+eval "$(rbenv init -)"
