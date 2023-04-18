@@ -1,1 +1,11 @@
+"*********************************************************************
+" ideavimrc
+"*********************************************************************
+
+" Enable join via the IDE
+set ideajoin
+
+" Enable native idea paste action for put operations
+set clipboard+=ideaput
+
 source ~/.vimrc

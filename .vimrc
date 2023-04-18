@@ -1,6 +1,7 @@
-" Search settings
-set incsearch
-set smartcase
+"*********************************************************************
+" Robert's vimrc
+"
+"*********************************************************************
 
 " Turn on syntax highlighting
 syntax on
@@ -12,7 +13,16 @@ set number
 set ruler
 
 " Use system clipboard
-set clipboard=unnamed
+set clipboard=unnamed,unnamedplus
+
+" Ignore case of searches
+set ignorecase
+
+" When searching try to be smart about cases
+set smartcase
+
+" Highlight dynamically as pattern is typed
+set incsearch
 
 " Hard mode
 noremap <Up> <NOP>
