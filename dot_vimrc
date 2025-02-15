@@ -12,39 +12,44 @@
 " text scroll if you mouse-click near the start or end of the window.
 set scrolloff=10
 
-" Turn on syntax highlighting
+" Turn on syntax highlighting.
 syntax on
 
-" Show line numbers
+" Show line numbers.
 set number
 
 " Show current mode and commands.
 set showmode
 set showcmd
 
-" Showfile stats
+" Showfile stats.
 set ruler
 
-" Use system clipboard
+" Use system clipboard.
 set clipboard=unnamed,unnamedplus
+
+" Assign spacebar as leader key.
+let mapleader = " "
 
 "**********************************
 " Search Settings
 "**********************************
 
-" Ignore case of searches
+" Ignore case of searches.
 set ignorecase
 
-" When searching try to be smart about cases
+" When searching try to be smart about cases.
 set smartcase
 
-" Highlight dynamically as pattern is typed
+" Highlight dynamically as pattern is typed.
 set incsearch
 
-" Highlight all search results
+" Highlight all search results.
 set hlsearch
 
-" Hard mode
+"**********************************
+" Hard Mode 
+"**********************************
 noremap <Up> <NOP>
 noremap <Down> <NOP>
 noremap <Left> <NOP>
@@ -54,6 +59,9 @@ inoremap <Down> <NOP>
 inoremap <Left> <NOP>
 inoremap <Right> <NOP>
 
+"**********************************
+" Plugin Settings 
+"**********************************
 filetype plugin indent on
 " Show existing tab with 2 spaces width
 set tabstop=2
