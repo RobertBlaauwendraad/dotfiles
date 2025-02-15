@@ -1,31 +1,78 @@
-" .ideavimrc is a configuration file for IdeaVim plugin. It uses
-"   the same commands as the original .vimrc configuration.
-" You can find a list of commands here: https://jb.gg/h38q75
-" Find more examples here: https://jb.gg/share-ideavimrc
+"*********************************************************************
+" Robert's dot_ideavimrc
+" Inspired by: https://www.cyberwizard.io/posts/the-ultimate-ideavim-setup/
+"
+"*********************************************************************
 
 " Source your .vimrc
 source ~/.vimrc
 
-"" -- Suggested options --
-" Show a few lines of context around the cursor. Note that this makes the
-" text scroll if you mouse-click near the start or end of the window.
-set scrolloff=5
+"**********************************
+" Basic Settings
+"**********************************
 
-" Do incremental searching.
-set incsearch
+" Show line numbers.
+set linenumber
 
 " Don't use Ex mode, use Q for formatting.
 map Q gq
 
-" --- Enable IdeaVim plugins https://jb.gg/ideavim-plugins
+"**********************************
+" Plugin Settings
+" Enable IdeaVim plugins https://jb.gg/ideavim-plugins
+"**********************************
+
+" Change surrounds
+set surround
 
 " Highlight copied text
 Plug 'machakann/vim-highlightedyank'
+
+" Sneak
+set sneak
+
+" NERDTree
+set nerdtree
+
+" EasyMotion
+set easymotion
+set notimeout
+
+" Which-Key
+set which-key
+
 " Commentary plugin
-Plug 'tpope/vim-commentary'
+" Plug 'tpope/vim-commentary'
 
+"**********************************
+" Key Mappings 
+" Map IDE actions to IdeaVim https://jb.gg/abva4t
+"**********************************
 
-"" -- Map IDE actions to IdeaVim -- https://jb.gg/abva4t
+" TODO: Debug capitalization and test usage of tabs
+" Move between tabs with Alt + p/n
+nnoremap <A-n> :tabnext<CR>
+nnoremap <A-p> :tabprev<CR>
+
+" Move between panes with Alt + h/j/k/l
+nnoremap <A-h> <C-w>h
+nnoremap <A-l> <C-w>l
+nnoremap <A-k> <C-w>k
+nnoremap <A-j> <C-w>j
+
+" Move between methods in the current files
+map [[ <Action>(MethodUp)
+map ]] <Action>(MethodDown)
+
+" Simplify indentation in visual mode, by making the action repeatable 
+vnoremap < <gv
+vnoremap > >gv
+
+" TODO: Test if it works
+" Move between autocomplete pop-up suggestions with Ctrl + j/k
+map <C-j> <Action>(PopupMenu-selectNext)
+map <C-k> <Action>(PopupMenu-selectPrev)
+
 "" Map \r to the Reformat Code action
 "map \r <Action>(ReformatCode)
 
