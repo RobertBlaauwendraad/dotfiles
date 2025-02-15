@@ -1,0 +1,63 @@
+"*********************************************************************
+" Robert's dot_vimrc
+" Extended by dot_ideavimrc for IdeaVim specific settings
+"
+"*********************************************************************
+
+"**********************************
+" Basic Settings
+"**********************************
+
+" Show a few lines of context around the cursor. Note that this makes the
+" text scroll if you mouse-click near the start or end of the window.
+set scrolloff=10
+
+" Turn on syntax highlighting
+syntax on
+
+" Show line numbers
+set number
+
+" Show current mode and commands.
+set showmode
+set showcmd
+
+" Showfile stats
+set ruler
+
+" Use system clipboard
+set clipboard=unnamed,unnamedplus
+
+"**********************************
+" Search Settings
+"**********************************
+
+" Ignore case of searches
+set ignorecase
+
+" When searching try to be smart about cases
+set smartcase
+
+" Highlight dynamically as pattern is typed
+set incsearch
+
+" Highlight all search results
+set hlsearch
+
+" Hard mode
+noremap <Up> <NOP>
+noremap <Down> <NOP>
+noremap <Left> <NOP>
+noremap <Right> <NOP>
+inoremap <Up> <NOP>
+inoremap <Down> <NOP>
+inoremap <Left> <NOP>
+inoremap <Right> <NOP>
+
+filetype plugin indent on
+" Show existing tab with 2 spaces width
+set tabstop=2
+" when indenting with '>', use 2 spaces width
+set shiftwidth=2
+" On pressing tab, insert 2 spaces
+set expandtab
