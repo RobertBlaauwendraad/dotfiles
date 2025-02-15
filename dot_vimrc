@@ -48,6 +48,13 @@ set incsearch
 set hlsearch
 
 "**********************************
+" Key Mappings 
+"**********************************
+
+" jk sequence escapes current mode
+inoremap jk <Esc>
+
+"**********************************
 " Hard Mode 
 "**********************************
 noremap <Up> <NOP>
