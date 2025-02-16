@@ -29,7 +29,7 @@ set ruler
 set clipboard=unnamed,unnamedplus
 
 " Assign spacebar as leader key.
-let mapleader = " "
+map <Space> <Leader>
 
 "**********************************
 " Search Settings
