@@ -98,10 +98,12 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-# nvm initialization
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# fnm
+FNM_PATH="/Users/$USER/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="/Users/robert/Library/Application Support/fnm:$PATH"
+  eval "$(fnm env --use-on-cd --shell zsh --version-file-strategy=recursive --corepack-enabled --resolve-engines)"
+fi
 
 # Load Python from uv
 . "$HOME/.local/bin/env"
