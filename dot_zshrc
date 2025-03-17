@@ -108,3 +108,9 @@ fi
 # Load Python from uv
 . "$HOME/.local/bin/env"
 
+# Print newline after command, but not when starting the terminal
+precmd() {
+    precmd() {
+        echo
+    }
+}
