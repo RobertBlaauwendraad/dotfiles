@@ -17,6 +17,9 @@ set linenumber
 " Don't use Ex mode, use Q for formatting
 map Q gq
 
+" scrolloff is bugged with ipynb files
+set scrolloff=0
+
 "**********************************
 " Plugin Settings
 " IdeaVim plugins https://jb.gg/ideavim-plugins
