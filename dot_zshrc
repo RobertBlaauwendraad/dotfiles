@@ -117,3 +117,9 @@ fi
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# the following lines have been added by docker desktop to enable docker cli completions.
+fpath=(/users/robert/.docker/completions $fpath)
+autoload -Uz compinit
+compinit
+# end of docker cli completions
