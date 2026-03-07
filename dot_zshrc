@@ -33,6 +33,9 @@ zstyle ':fzf-tab:*' switch-group ',' '.'
 
 # Plugins — async, order matters
 zinit ice wait lucid
+zinit snippet OMZP::git
+
+zinit ice wait lucid
 zinit light Aloxaf/fzf-tab
 
 zinit ice wait lucid
