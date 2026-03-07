@@ -1,0 +1,13 @@
+// ~/.config/zellij/config.kdl
+default_shell "zsh"
+pane_frames false
+theme "catppuccin-mocha"
+
+keybinds {
+    normal {
+        bind "Alt h" { MoveFocus "Left"; }
+        bind "Alt l" { MoveFocus "Right"; }
+        bind "Alt j" { MoveFocus "Down"; }
+        bind "Alt k" { MoveFocus "Up"; }
+    }
+}
