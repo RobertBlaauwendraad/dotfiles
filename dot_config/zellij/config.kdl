@@ -3,11 +3,34 @@ default_shell "zsh"
 pane_frames false
 theme "catppuccin-mocha"
 
-keybinds {
+keybinds clear-defaults=true {
     normal {
-        bind "Alt h" { MoveFocus "Left"; }
-        bind "Alt l" { MoveFocus "Right"; }
-        bind "Alt j" { MoveFocus "Down"; }
-        bind "Alt k" { MoveFocus "Up"; }
+        // Pane navigation
+        bind "Ctrl Alt Shift Super h" { MoveFocus "Left"; }
+        bind "Ctrl Alt Shift Super l" { MoveFocus "Right"; }
+        bind "Ctrl Alt Shift Super k" { MoveFocus "Up"; }
+        bind "Ctrl Alt Shift Super j" { MoveFocus "Down"; }
+        bind "Ctrl Alt Shift Super b" { NewPane "Left"; }
+        bind "Ctrl Alt Shift Super n" { NewPane "Right"; }
+        bind "Ctrl Alt Shift Super u" { NewPane "Up"; }
+        bind "Ctrl Alt Shift Super d" { NewPane "Down"; }
+        bind "Ctrl Alt Shift Super x" { CloseFocus; }
+        bind "Ctrl Alt Shift Super f" { ToggleFocusFullscreen; }
+
+        // Tabs
+        bind "Ctrl Alt Shift Super t" { NewTab; }
+        bind "Ctrl Alt Shift Super w" { CloseTab; }
+        bind "Ctrl Alt Shift Super ]" { GoToNextTab; }
+        bind "Ctrl Alt Shift Super [" { GoToPreviousTab; }
+
+        // Pane resize
+        bind "Ctrl Alt Shift Super Right" { Resize "Increase Right"; }
+        bind "Ctrl Alt Shift Super Left"  { Resize "Increase Left"; }
+        bind "Ctrl Alt Shift Super Up"    { Resize "Increase Up"; }
+        bind "Ctrl Alt Shift Super Down"  { Resize "Increase Down"; }
+
+        // Session
+        bind "Ctrl Alt Shift Super q" { Detach; }
+        bind "Ctrl Alt Shift Super s" { NewTab; SwitchToMode "RenameTab"; }
     }
 }

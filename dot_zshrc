@@ -1,6 +1,8 @@
 # uv (Python) — must be before instant prompt
 [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 
+export TERM=xterm-256color
+
 # Auto-start zellij
 if [[ -z "$ZELLIJ" ]]; then
   exec zellij
@@ -38,7 +40,6 @@ zinit snippet OMZP::git
 zinit ice wait lucid
 zinit light Aloxaf/fzf-tab
 
-zinit ice wait lucid
 zinit light zsh-users/zsh-autosuggestions
 
 zinit ice wait lucid
@@ -53,6 +54,13 @@ HISTSIZE=50000
 SAVEHIST=50000
 HISTFILE=~/.zsh_history
 setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_VERIFY
+
+# Case insensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+# History search prefix matching
+bindkey '^[[A' history-search-backward
+bindkey '^[[B' history-search-forward
 
 # Autosuggestions — use history first, fall back to completion
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
