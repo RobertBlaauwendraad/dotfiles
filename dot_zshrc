@@ -4,7 +4,7 @@
 export TERM=xterm-256color
 
 # Auto-start zellij
-if [[ -z "$ZELLIJ" ]]; then
+if [[ -z "$ZELLIJ" && $TERM_PROGRAM == "ghostty" ]]; then
   exec zellij
 fi
 
