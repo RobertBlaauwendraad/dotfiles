@@ -29,12 +29,26 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
+    branch = "main",
     build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter.config").setup({
-        ensure_installed = "all",
-        highlight = { enable = true },
-        indent = { enable = true },
+      -- main branch: install parsers explicitly (async, no-op if present).
+      -- Compiled with the tree-sitter CLI, see Brewfile: tree-sitter-cli.
+      require("nvim-treesitter").install({
+        "bash", "css", "diff", "gitcommit", "go", "html", "javascript",
+        "json", "jsonc", "lua", "luadoc", "markdown", "markdown_inline",
+        "python", "query", "rust", "toml", "tsx", "typescript", "vim",
+        "vimdoc", "yaml",
+      })
+
+      -- main branch doesn't wire highlighting/indent for us; do it per buffer
+      -- when a parser is available for the filetype.
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function(ev)
+          if pcall(vim.treesitter.start) then
+            vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
       })
     end,
   },

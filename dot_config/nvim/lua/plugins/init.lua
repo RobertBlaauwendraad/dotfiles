@@ -12,4 +12,7 @@ require("lazy").setup({
   { import = "plugins.ui" },
   { import = "plugins.editor" },
   { import = "plugins.lsp" },
+}, {
+  -- No plugin here needs luarocks; disabling it drops the hererocks health error.
+  rocks = { enabled = false },
 })

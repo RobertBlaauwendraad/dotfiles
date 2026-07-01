@@ -1,0 +1,9 @@
+// ~/.config/zellij/layouts/default.kdl
+// Overrides zellij's built-in default. Same as the built-in but without the
+// bottom status-bar (keybind-hint bar, blank in our bindless Normal mode).
+layout {
+    pane size=1 borderless=true {
+        plugin location="tab-bar"
+    }
+    pane
+}

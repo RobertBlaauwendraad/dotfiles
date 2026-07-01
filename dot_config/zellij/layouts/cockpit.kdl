@@ -19,8 +19,8 @@
 //
 // For isolated/parallel agent work in a git worktree, use `wt <path>` instead.
 //
-// tab-bar / status-bar are included so this tab matches the session's others
-// (a --layout tab supplies its own chrome).
+// Only tab-bar: the built-in status-bar just shows keybind hints, blank in our
+// bindless Normal mode. Default layout drops it too, so tabs stay consistent.
 layout hide_floating_panes=true {
     pane size=1 borderless=true {
         plugin location="tab-bar"
@@ -31,9 +31,6 @@ layout hide_floating_panes=true {
             pane command="lazygit" size="75%"
             pane size="25%"    // spare shell — always visible, doesn't hide lazygit
         }
-    }
-    pane size=1 borderless=true {
-        plugin location="status-bar"
     }
     floating_panes {
         pane command="claude" name="claude" {
