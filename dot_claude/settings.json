@@ -8,5 +8,25 @@
     "type": "command",
     "command": "bash $HOME/.claude/statusline.sh",
     "padding": 0
+  },
+  "permissions": {
+    "allow": [
+      "Bash(chezmoi diff:*)",
+      "Bash(chezmoi cat:*)",
+      "Bash(chezmoi status:*)",
+      "Bash(chezmoi verify:*)",
+      "Bash(chezmoi data:*)",
+      "Bash(chezmoi managed:*)",
+      "Bash(chezmoi source-path:*)",
+      "Bash(chezmoi execute-template:*)",
+      "Bash(go vet:*)",
+      "Bash(gofmt -l:*)",
+      "Bash(zellij setup:*)"
+    ],
+    "ask": [
+      "Bash(chezmoi apply:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ]
   }
 }
