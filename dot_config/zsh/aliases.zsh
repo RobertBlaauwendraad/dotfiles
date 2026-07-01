@@ -7,5 +7,6 @@ alias la='eza -a --icons'
 alias cat='bat --paging=never'
 
 # Tools
+alias lg='lazygit'
 alias cheat='open ~/Documents/dev/cheatsheet.html'
 
