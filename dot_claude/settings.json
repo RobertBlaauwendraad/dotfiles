@@ -1,0 +1,7 @@
+{
+  "model": "opus[1m]",
+  "alwaysThinkingEnabled": true,
+  "advisorModel": "opus",
+  "theme": "dark",
+  "tui": "fullscreen"
+}

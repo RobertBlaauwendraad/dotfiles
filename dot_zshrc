@@ -1,8 +1,6 @@
 # uv (Python) — must be before instant prompt
 [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 
-export TERM=xterm-256color
-
 # Auto-start zellij
 if [[ -z "$ZELLIJ" && $TERM_PROGRAM == "ghostty" ]]; then
   exec zellij
@@ -65,32 +63,31 @@ bindkey '^[[B' history-search-forward
 # Autosuggestions — use history first, fall back to completion
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
-# Modern CLI
-eval "$(zoxide init zsh --cmd cd)"
-eval "$(fzf --zsh)"
-
+# Environment
+export EDITOR='nvim'
+export HOMEBREW_NO_ENV_HINTS=true
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 
-# fnm (Node)
+# PATH
+export PATH="$HOME/.opencode/bin:$PATH"
+export PATH="$HOME/Code/flutter/bin:$PATH"
+export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+export PATH="$PATH:$HOME/.pub-cache/bin"
+export PNPM_HOME="$HOME/Library/pnpm"
+[[ ":$PATH:" != *":$PNPM_HOME:"* ]] && export PATH="$PNPM_HOME:$PATH"
+
+# Tool init
+eval "$(fzf --zsh)"
 if [[ -d "$HOME/.local/share/fnm" ]]; then
   eval "$(fnm env --use-on-cd --shell zsh --version-file-strategy=recursive --corepack-enabled --resolve-engines)"
 fi
-
-# Paths & tools
-export PATH="$HOME/.jbang/bin:$HOME/.opencode/bin:$PATH"
-export HOMEBREW_NO_ENV_HINTS=true
-export EDITOR='nvim'
 
 # Aliases
 [[ -f ~/.config/zsh/aliases.zsh ]] && source ~/.config/zsh/aliases.zsh
 
 # P10k config
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+[[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-# pnpm 
-export PNPM_HOME="/Users/robert/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
+# zoxide — must init LAST so its `cd` hook sits on top of fnm's use-on-cd hook
+eval "$(zoxide init zsh --cmd cd)"

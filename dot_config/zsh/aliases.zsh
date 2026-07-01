@@ -7,7 +7,6 @@ alias la='eza -a --icons'
 alias cat='bat --paging=never'
 
 # Tools
-alias j!=jbang
 alias cheat='open ~/Documents/dev/cheatsheet.html'
 
 # Layouts

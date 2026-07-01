@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Installs all CLI tools + apps this dotfiles setup depends on.
+# `run_onchange_` => chezmoi re-runs this automatically whenever the content
+# below changes (the Brewfile is inlined, so editing the list re-triggers it).
+set -euo pipefail
+
+{{ if eq .chezmoi.os "darwin" -}}
+# Install Homebrew if missing
+if ! command -v brew >/dev/null 2>&1; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+brew bundle --no-lock --file=/dev/stdin <<'BREWFILE'
+# --- core ---
+brew "chezmoi"
+brew "git"
+brew "git-lfs"      # required by ~/.gitconfig filter "lfs"
+brew "gh"
+
+# --- modern CLI (aliased/used in .zshrc & aliases.zsh) ---
+brew "eza"          # ls
+brew "bat"          # cat
+brew "git-delta"    # lazygit/git pager (`delta`)
+brew "fd"           # FZF_DEFAULT_COMMAND
+brew "fzf"
+brew "zoxide"       # cd
+brew "ripgrep"
+
+# --- editors / multiplexer ---
+brew "neovim"
+brew "zellij"
+brew "lazygit"
+
+# --- runtimes / version managers ---
+brew "fnm"          # Node
+brew "uv"           # Python
+
+# --- terminal ---
+cask "ghostty"
+BREWFILE
+{{ end -}}

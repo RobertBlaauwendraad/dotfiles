@@ -22,6 +22,7 @@ keybinds clear-defaults=true {
         bind "Ctrl Alt Shift Super w" { CloseTab; }
         bind "Ctrl Alt Shift Super ]" { GoToNextTab; }
         bind "Ctrl Alt Shift Super [" { GoToPreviousTab; }
+        bind "Ctrl Alt Shift Super r" { SwitchToMode "RenameTab"; }
 
         // Pane resize
         bind "Ctrl Alt Shift Super Right" { Resize "Increase Right"; }
@@ -29,8 +30,67 @@ keybinds clear-defaults=true {
         bind "Ctrl Alt Shift Super Up"    { Resize "Increase Up"; }
         bind "Ctrl Alt Shift Super Down"  { Resize "Increase Down"; }
 
+        // Modes
+        bind "Ctrl Alt Shift Super e" { SwitchToMode "Scroll"; }    // scrollback: search / copy / edit
+        bind "Ctrl Alt Shift Super o" { SwitchToMode "Session"; }   // detach / session manager
+        bind "Ctrl Alt Shift Super g" { SwitchToMode "Locked"; }    // pass all keys through to the app
+
         // Session
         bind "Ctrl Alt Shift Super q" { Detach; }
         bind "Ctrl Alt Shift Super s" { NewTab; SwitchToMode "RenameTab"; }
+    }
+
+    renametab {
+        bind "Enter" { SwitchToMode "Normal"; }
+        bind "Esc" { UndoRenameTab; SwitchToMode "Normal"; }
+    }
+
+    // Scroll back through output, search it, or dump it into $EDITOR.
+    scroll {
+        bind "Esc" "Ctrl c" { SwitchToMode "Normal"; }
+        bind "j" "Down" { ScrollDown; }
+        bind "k" "Up" { ScrollUp; }
+        bind "d" { HalfPageScrollDown; }
+        bind "u" { HalfPageScrollUp; }
+        bind "Ctrl f" "PageDown" { PageScrollDown; }
+        bind "Ctrl b" "PageUp" { PageScrollUp; }
+        bind "g" { ScrollToTop; }
+        bind "G" { ScrollToBottom; }
+        bind "/" { SwitchToMode "EnterSearch"; SearchInput 0; }
+        bind "e" { EditScrollback; SwitchToMode "Normal"; }         // open scrollback in nvim (yank there)
+    }
+
+    entersearch {
+        bind "Esc" { SwitchToMode "Scroll"; }
+        bind "Enter" { SwitchToMode "Search"; }
+    }
+
+    search {
+        bind "Esc" "Ctrl c" { SwitchToMode "Normal"; }
+        bind "n" { Search "down"; }
+        bind "N" { Search "up"; }
+        bind "j" "Down" { ScrollDown; }
+        bind "k" "Up" { ScrollUp; }
+        bind "c" { SearchToggleOption "CaseSensitivity"; }
+        bind "w" { SearchToggleOption "Wrap"; }
+        bind "o" { SearchToggleOption "WholeWord"; }
+    }
+
+    // Detach or open the session manager (switch/create/kill sessions).
+    session {
+        bind "Esc" "Ctrl c" { SwitchToMode "Normal"; }
+        bind "d" { Detach; }
+        bind "w" {
+            LaunchOrFocusPlugin "session-manager" {
+                floating true
+                move_to_focused_tab true
+            }
+            SwitchToMode "Normal"
+        }
+    }
+
+    // Everything passes to the running app; same chord toggles back.
+    locked {
+        bind "Ctrl Alt Shift Super g" { SwitchToMode "Normal"; }
     }
 }
