@@ -3,5 +3,10 @@
   "alwaysThinkingEnabled": true,
   "advisorModel": "opus",
   "theme": "dark",
-  "tui": "fullscreen"
+  "tui": "fullscreen",
+  "statusLine": {
+    "type": "command",
+    "command": "bash $HOME/.claude/statusline.sh",
+    "padding": 0
+  }
 }
