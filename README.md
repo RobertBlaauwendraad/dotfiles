@@ -33,11 +33,30 @@ chezmoi cd                # jump to the source dir
 | `dot_config/nvim/` | Neovim (lazy.nvim) |
 | `dot_config/zellij/` | Zellij multiplexer + layouts |
 | `dot_config/ghostty/` | Ghostty terminal |
+| `dot_config/karabiner/` | Karabiner-Elements (Caps Lock → Esc/Ctrl) |
 | `dot_config/opencode/` | opencode config (templated) |
 | `dot_claude/` | Claude Code settings + `CLAUDE.md` → `AGENTS.md` |
 | `dot_config/AGENTS.md` | Shared AI-agent instructions |
 | `dot_gitconfig`, `dot_config/git/` | git config + global ignore |
 | `private_Library/.../lazygit/` | lazygit config |
+
+## Workflow
+
+Agentic development inside one persistent zellij session. In a repo, `cockpit`
+opens a tab with nvim + lazygit + a hidden `claude` pane — agents write, I review
+the diff in nvim (diffview) and stage in lazygit. Isolated or parallel agent work
+gets its own git worktree via `wt <path>`. Always evolving.
+
+## Keyboard & keybindings
+
+One idea: **most-used actions on the easiest keys; each layer stays out of the
+ones below it.** A terminal can't see `Cmd` and `Ctrl`/`Alt` are awkward, so the
+physical layer is remapped first.
+
+- **Caps Lock** → Esc (tap) / Ctrl (hold) — the one physical remap
+- **`Ctrl+g`** → zellij prefix (tmux-style; `clear-defaults` lets every other key fall through to nvim/shell)
+- **`Ctrl+hjkl`** → focus across nvim splits *and* zellij panes (zellij-nav.nvim)
+- **`Space`** → nvim leader + which-key groups
 
 ## Secrets / private values
 
