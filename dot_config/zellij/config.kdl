@@ -1,5 +1,7 @@
 // ~/.config/zellij/config.kdl
 default_shell "zsh"
+// on: frameless dupes the prompt (zellij#4047). Resize still leaves stale
+// prompt copies (zellij#3675, open) — harmless, Ctrl+L clears.
 pane_frames true
 theme "catppuccin-mocha"
 
