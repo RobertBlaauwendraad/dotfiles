@@ -22,6 +22,7 @@ cockpit() {
   zellij action new-tab --layout cockpit --cwd "$PWD" --name "Cockpit: ${${root:-$PWD}:t}"
   [[ -n "$origin" ]] && zellij action close-tab-by-id "$origin"
 }
+alias ck='cockpit'
 
 # Open an agent tab bound to a git worktree: cwd + tab name from the path.
 # e.g. `wt ../myproj-feature`
