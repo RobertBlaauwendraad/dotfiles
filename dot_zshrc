@@ -57,6 +57,10 @@ setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_VERIFY
 # Case insensitive completion
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
+# Use emacs keymap — otherwise EDITOR=nvim makes zsh default to vi mode,
+# where Esc enters command mode (prompt shows ❮) and letters run vi commands.
+bindkey -e
+
 # History search prefix matching
 bindkey '^[[A' history-search-backward
 bindkey '^[[B' history-search-forward
@@ -80,6 +84,7 @@ export PNPM_HOME="$HOME/Library/pnpm"
 
 # Tool init
 eval "$(fzf --zsh)"
+bindkey -r '^[c'  # drop fzf's Alt+c (cd) widget — fires on Esc c with caps→esc
 if [[ -d "$HOME/.local/share/fnm" ]]; then
   eval "$(fnm env --use-on-cd --shell zsh --version-file-strategy=recursive --corepack-enabled --resolve-engines)"
 fi
