@@ -10,9 +10,11 @@ alias cat='bat --paging=never'
 alias lg='lazygit'
 alias cheat='open ~/Documents/dev/cheatsheet.html'
 
-# Open a cockpit tab (lazygit + shell) in the current repo. Ghostty already
-# drops you in the persistent "main" session on a plain shell; run this from a
-# repo when you want the review workspace — lazygit opens on that repo.
+# Open a cockpit tab (nvim + claude/lazygit/shell stack) in the current repo.
+# Ghostty already drops you in the persistent "main" session on a plain shell;
+# run this from a repo when you want the full workspace — nvim, lazygit, and the
+# shell all open on that repo. A claude session runs in a hidden floating pane;
+# reveal/hide it with Ctrl Alt Shift Super p.
 cockpit() {
   [[ -n "$ZELLIJ" ]] || { echo "cockpit: run inside zellij (open Ghostty)" >&2; return 1; }
   local root="$(git rev-parse --show-toplevel 2>/dev/null)"

@@ -2,21 +2,40 @@
 // Tab layout summoned by the `cockpit` alias from inside the persistent "main"
 // session: `zellij action new-tab --layout cockpit --cwd <repo>`.
 //
-// lazygit for review/merge on the left, a shell on the right for `git worktree`
-// ops and launching agent tabs (`wt <path>`). Because `cockpit` passes the
-// current dir as --cwd, lazygit opens on whatever repo you ran it from.
+// The full cockpit for working on a repo: nvim on the left for edit/review,
+// and a stacked column on the right holding lazygit and a shell. Stacked panes
+// collapse to title bars — focus one to expand it, or fullscreen with
+// `Ctrl Alt Shift Super f`. Everything opens on the repo (--cwd).
+//
+// A claude session runs in a floating pane that starts hidden
+// (hide_floating_panes) — so normal cockpits just show nvim + the stack. Reveal
+// / hide it any time with `Ctrl Alt Shift Super p` (ToggleFloatingPanes); it's
+// already running when you summon it.
+//
+// For isolated/parallel agent work in a git worktree, use `wt <path>` instead.
 //
 // tab-bar / status-bar are included so this tab matches the session's others
 // (a --layout tab supplies its own chrome).
-layout {
+layout hide_floating_panes=true {
     pane size=1 borderless=true {
         plugin location="tab-bar"
     }
     pane split_direction="vertical" {
-        pane command="lazygit" size="60%"
-        pane
+        pane command="nvim" size="60%"
+        pane stacked=true {
+            pane command="lazygit"
+            pane            // spare shell
+        }
     }
     pane size=1 borderless=true {
         plugin location="status-bar"
+    }
+    floating_panes {
+        pane command="claude" name="claude" {
+            x "8%"
+            y "6%"
+            width "84%"
+            height "82%"
+        }
     }
 }

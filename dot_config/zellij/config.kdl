@@ -1,6 +1,6 @@
 // ~/.config/zellij/config.kdl
 default_shell "zsh"
-pane_frames false
+pane_frames true
 theme "catppuccin-mocha"
 
 keybinds clear-defaults=true {
@@ -16,6 +16,11 @@ keybinds clear-defaults=true {
         bind "Ctrl Alt Shift Super d" { NewPane "Down"; }
         bind "Ctrl Alt Shift Super x" { CloseFocus; }
         bind "Ctrl Alt Shift Super f" { ToggleFocusFullscreen; }
+
+        // Floating panes: p shows/hides the floating layer (new pane there is
+        // floating); i pops the focused pane in/out of floating.
+        bind "Ctrl Alt Shift Super p" { ToggleFloatingPanes; }
+        bind "Ctrl Alt Shift Super i" { TogglePaneEmbedOrFloating; }
 
         // Tabs
         bind "Ctrl Alt Shift Super t" { NewTab; }
