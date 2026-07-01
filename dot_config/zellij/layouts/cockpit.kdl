@@ -3,8 +3,10 @@
 // session: `zellij action new-tab --layout cockpit --cwd <repo>`.
 //
 // The full cockpit for working on a repo: nvim on the left (where reviewing
-// happens too — `<leader>gv` opens diffview), lazygit on the right for staging,
-// commits and history, and a spare shell below it (small but always visible).
+// happens too — `<leader>gv` opens diffview; `<leader>gw` picks a git worktree
+// and reviews its changes right here, so you never leave this cockpit to look
+// at an agent's worktree), lazygit on the right for staging, commits and
+// history, and a spare shell below it (small but always visible).
 // Fullscreen any pane with the zellij prefix then `f` (Ctrl+g, then f).
 // Everything opens on the repo (--cwd).
 //

@@ -15,7 +15,12 @@ return {
   },
   {
     "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      -- Routes vim.ui.select() through a telescope picker instead of the built-in
+      -- cmdline list (which needs a "Press ENTER" for lists taller than cmdheight).
+      "nvim-telescope/telescope-ui-select.nvim",
+    },
     keys = {
       { "<leader>ff", "<cmd>Telescope find_files<CR>", desc = "Find files" },
       { "<leader>fg", "<cmd>Telescope live_grep<CR>",  desc = "Grep in files" },
@@ -24,7 +29,13 @@ return {
       { "<leader>fc", "<cmd>Telescope commands<CR>",   desc = "Commands" },
     },
     config = function()
-      require("telescope").setup()
+      require("telescope").setup({
+        extensions = {
+          ["ui-select"] = { require("telescope.themes").get_dropdown() },
+        },
+      })
+      -- pcall so a not-yet-installed extension can't take down telescope setup.
+      pcall(require("telescope").load_extension, "ui-select")
     end,
   },
   {
@@ -73,6 +84,9 @@ return {
     keys = {
       { "<leader>gv", "<cmd>DiffviewOpen<CR>",          desc = "Diff: review changes" },
       { "<leader>gm", "<cmd>DiffviewOpen origin/main<CR>", desc = "Diff: vs origin/main" },
+      -- Review another worktree's changes without leaving this cockpit: pick a
+      -- worktree, diffview opens against it via -C (nvim's cwd stays on this repo).
+      { "<leader>gw", function() require("worktree").review_diff() end, desc = "Diff: review a worktree" },
       { "<leader>gh", "<cmd>DiffviewFileHistory %<CR>", desc = "Diff: file history" },
       { "<leader>gH", "<cmd>DiffviewFileHistory<CR>",   desc = "Diff: repo history" },
       { "<leader>gq", "<cmd>DiffviewClose<CR>",         desc = "Diff: close" },
