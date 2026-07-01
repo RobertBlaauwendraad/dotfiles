@@ -13,7 +13,8 @@ alias cheat='open ~/Documents/dev/cheatsheet.html'
 # Open the cockpit (nvim + claude/lazygit/shell stack) on this repo, replacing
 # the current tab: spawn the layout in a fresh tab, then close the one you ran
 # from. new-tab initialises the tab-bar cleanly (override-layout doesn't).
-# Claude runs in a hidden floating pane; reveal/hide it with Ctrl Alt Shift Super p.
+# Claude runs in a hidden floating pane; reveal/hide it with the zellij prefix
+# then p (Ctrl+g, then p).
 cockpit() {
   [[ -n "$ZELLIJ" ]] || { echo "cockpit: run inside zellij (open Ghostty)" >&2; return 1; }
   local root="$(git rev-parse --show-toplevel 2>/dev/null)"

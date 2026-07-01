@@ -2,15 +2,20 @@
 // Tab layout summoned by the `cockpit` alias from inside the persistent "main"
 // session: `zellij action new-tab --layout cockpit --cwd <repo>`.
 //
-// The full cockpit for working on a repo: nvim on the left for edit/review,
-// and a stacked column on the right holding lazygit and a shell. Stacked panes
-// collapse to title bars — focus one to expand it, or fullscreen with
-// `Ctrl Alt Shift Super f`. Everything opens on the repo (--cwd).
+// The full cockpit for working on a repo: nvim on the left (where reviewing
+// happens too — `<leader>gv` opens diffview), lazygit on the right for staging,
+// commits and history, and a spare shell below it (small but always visible).
+// Fullscreen any pane with the zellij prefix then `f` (Ctrl+g, then f).
+// Everything opens on the repo (--cwd).
+//
+// The 60/40 split is provisional: now that diff review lives in nvim (diffview)
+// rather than in a lazygit<->nvim bounce, nvim may want more width and lazygit
+// less. Tune once it's had some real use.
 //
 // A claude session runs in a floating pane that starts hidden
-// (hide_floating_panes) — so normal cockpits just show nvim + the stack. Reveal
-// / hide it any time with `Ctrl Alt Shift Super p` (ToggleFloatingPanes); it's
-// already running when you summon it.
+// (hide_floating_panes) — so normal cockpits just show nvim + lazygit. Reveal
+// / hide it any time with the zellij prefix then `p` (Ctrl+g, then p —
+// ToggleFloatingPanes); it's already running when you summon it.
 //
 // For isolated/parallel agent work in a git worktree, use `wt <path>` instead.
 //
@@ -22,9 +27,9 @@ layout hide_floating_panes=true {
     }
     pane split_direction="vertical" {
         pane command="nvim" size="60%"
-        pane stacked=true {
-            pane command="lazygit"
-            pane            // spare shell
+        pane split_direction="horizontal" size="40%" {
+            pane command="lazygit" size="75%"
+            pane size="25%"    // spare shell — always visible, doesn't hide lazygit
         }
     }
     pane size=1 borderless=true {

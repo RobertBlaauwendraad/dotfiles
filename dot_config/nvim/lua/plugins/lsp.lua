@@ -1,3 +1,5 @@
+local servers = { "ts_ls", "pyright", "lua_ls", "jsonls", "cssls", "html" }
+
 return {
   {
     "williamboman/mason.nvim",
@@ -9,31 +11,44 @@ return {
     "williamboman/mason-lspconfig.nvim",
     dependencies = { "williamboman/mason.nvim" },
     config = function()
-      require("mason-lspconfig").setup({
-        ensure_installed = {
-          "ts_ls", "pyright", "lua_ls", "jsonls", "cssls", "html",
-        },
-        automatic_installation = true,
-      })
+      require("mason-lspconfig").setup({ ensure_installed = servers })
     end,
   },
   {
     "neovim/nvim-lspconfig",
-    dependencies = { "williamboman/mason-lspconfig.nvim" },
+    dependencies = {
+      "williamboman/mason-lspconfig.nvim",
+      "hrsh7th/cmp-nvim-lsp",
+    },
     config = function()
-      local servers = { "ts_ls", "pyright", "lua_ls", "jsonls", "cssls", "html" }
+      -- Let every server advertise nvim-cmp's completion capabilities
+      vim.lsp.config["*"] = {
+        capabilities = require("cmp_nvim_lsp").default_capabilities(),
+      }
       for _, server in ipairs(servers) do
-        vim.lsp.config[server] = {}
         vim.lsp.enable(server)
       end
 
-      vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition,     { desc = "Go to definition" })
-      vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation,  { desc = "Go to implementation" })
-      vim.keymap.set("n", "<leader>gu", vim.lsp.buf.references,      { desc = "Show usages" })
-      vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename,          { desc = "Rename element" })
-      vim.keymap.set("n", "<leader>am", vim.lsp.buf.code_action,     { desc = "Code actions" })
-      vim.keymap.set("n", "<leader>en", vim.diagnostic.goto_next,    { desc = "Next error" })
-      vim.keymap.set("n", "<leader>ep", vim.diagnostic.goto_prev,    { desc = "Prev error" })
+      -- Show diagnostics inline (virtual_text defaults to off on nvim 0.11+)
+      vim.diagnostic.config({
+        virtual_text = true,
+        severity_sort = true,
+        float = { border = "rounded" },
+      })
+
+      -- Rely on nvim 0.11+ built-in LSP maps: grr (references), gri
+      -- (implementation), grt (type definition), gra (code action), grn
+      -- (rename), gO (document symbols), K (hover), and [d / ]d / <C-w>d for
+      -- diagnostics. We add only what nvim leaves out.
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(ev)
+          local function m(lhs, rhs, desc)
+            vim.keymap.set("n", lhs, rhs, { buffer = ev.buf, silent = true, desc = desc })
+          end
+          m("gd", vim.lsp.buf.definition, "Go to definition")   -- nvim has no LSP gd
+          m("<leader>cf", function() vim.lsp.buf.format({ async = true }) end, "Format buffer")
+        end,
+      })
     end,
   },
   {

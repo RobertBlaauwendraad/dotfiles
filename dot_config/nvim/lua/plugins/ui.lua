@@ -17,7 +17,7 @@ return {
   {
     "nvim-tree/nvim-tree.lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
-    keys = { { "<leader>x", "<cmd>NvimTreeToggle<CR>", desc = "Toggle file tree" } },
+    keys = { { "<leader>e", "<cmd>NvimTreeToggle<CR>", desc = "File tree" } },
     config = function()
       require("nvim-tree").setup()
     end,
@@ -26,7 +26,15 @@ return {
     "folke/which-key.nvim",
     event = "VeryLazy",
     config = function()
-      require("which-key").setup()
+      local wk = require("which-key")
+      wk.setup({ delay = 200 })
+      wk.add({
+        { "<leader>b", group = "buffer" },
+        { "<leader>c", group = "code" },
+        { "<leader>f", group = "find" },
+        { "<leader>g", group = "git" },
+        { "<leader>w", group = "window" },
+      })
     end,
   },
 }
