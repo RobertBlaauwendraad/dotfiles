@@ -1,9 +1,9 @@
 # uv (Python) — must be before instant prompt
 [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 
-# Auto-start zellij
+# Auto-start zellij — attach to one persistent session, create it if absent
 if [[ -z "$ZELLIJ" && $TERM_PROGRAM == "ghostty" ]]; then
-  exec zellij
+  exec zellij attach -c main
 fi
 
 # P10k instant prompt — must stay near top
