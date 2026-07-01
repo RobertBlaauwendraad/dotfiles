@@ -1,7 +1,8 @@
 # uv (Python) — must be before instant prompt
 [[ -f "$HOME/.local/bin/env" ]] && . "$HOME/.local/bin/env"
 
-# Auto-start zellij — attach to one persistent session, create it if absent
+# Auto-start zellij — attach to one persistent session, create it if absent.
+# Opens on a plain shell; run `cockpit` in a repo for the lazygit workspace.
 if [[ -z "$ZELLIJ" && $TERM_PROGRAM == "ghostty" ]]; then
   exec zellij attach -c main
 fi

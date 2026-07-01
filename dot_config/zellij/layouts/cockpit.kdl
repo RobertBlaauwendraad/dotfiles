@@ -1,0 +1,22 @@
+// ~/.config/zellij/layouts/cockpit.kdl
+// Tab layout summoned by the `cockpit` alias from inside the persistent "main"
+// session: `zellij action new-tab --layout cockpit --cwd <repo>`.
+//
+// lazygit for review/merge on the left, a shell on the right for `git worktree`
+// ops and launching agent tabs (`wt <path>`). Because `cockpit` passes the
+// current dir as --cwd, lazygit opens on whatever repo you ran it from.
+//
+// tab-bar / status-bar are included so this tab matches the session's others
+// (a --layout tab supplies its own chrome).
+layout {
+    pane size=1 borderless=true {
+        plugin location="tab-bar"
+    }
+    pane split_direction="vertical" {
+        pane command="lazygit" size="60%"
+        pane
+    }
+    pane size=1 borderless=true {
+        plugin location="status-bar"
+    }
+}
