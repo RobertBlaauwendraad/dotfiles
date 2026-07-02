@@ -61,3 +61,15 @@ wt() {
   zellij action new-tab --layout "$layout" --cwd "$dir" --name "$name"
 }
 
+# Toggle desktop popups for the Claude agent-status hook. Tab markers
+# (⋯ busy · ✓ done · ? needs-input) are always on; this flips only the macOS
+# notification, via a flag file the hook reads fresh on each fire.
+agent-popups() {
+  local flag="$HOME/.claude/notify-popups"
+  case "$1" in
+    on)  : > "$flag"; echo "agent popups: on" ;;
+    off) rm -f "$flag"; echo "agent popups: off" ;;
+    *)   [[ -f "$flag" ]] && echo "agent popups: on" || echo "agent popups: off" ;;
+  esac
+}
+
