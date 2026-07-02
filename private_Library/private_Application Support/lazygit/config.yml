@@ -1,3 +1,26 @@
 git:
   pagers:
     - pager: delta --dark --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}";
+
+# Open files in the cockpit's nvim pane instead of a nested editor. Powers the
+# `e` key, and — via editAtLine — clicking a `lazygit-edit://` delta hyperlink.
+# cockpit-nvim falls back to editing in place when there's no cockpit nvim.
+# lazygit runs these through a shell, so $HOME expands (the zellij daemon's PATH
+# may lack ~/.local/bin, so we don't rely on a bare command name).
+# editInTerminal: false — the command dispatches to the nvim pane and returns at
+# once, so lazygit must not suspend or show "press enter to return".
+os:
+  edit: '$HOME/.local/bin/cockpit-nvim open {{filename}}'
+  editAtLine: '$HOME/.local/bin/cockpit-nvim open {{filename}} {{line}}'
+  editAtLineAndWait: '$HOME/.local/bin/cockpit-nvim open {{filename}} {{line}}'
+  editInTerminal: false
+
+# lazygit fires no event on its built-in worktree switch (<space>), so <enter>
+# — unbound in this view — sends the selected worktree to nvim (cd + open its
+# diff). <space> still switches lazygit's own worktree; the two are independent.
+customCommands:
+  - key: '<enter>'
+    context: 'worktrees'
+    description: 'Open worktree in nvim (cd + diff)'
+    command: '$HOME/.local/bin/cockpit-nvim worktree "{{ .SelectedWorktree.Path }}"'
+    output: none

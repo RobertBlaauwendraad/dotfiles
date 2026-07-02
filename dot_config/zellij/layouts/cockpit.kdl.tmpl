@@ -2,10 +2,10 @@
 // Tab layout summoned by the `cockpit` alias from inside the persistent "main"
 // session: `zellij action new-tab --layout cockpit --cwd <repo>`.
 //
-// The full cockpit for working on a repo: nvim on the left (where reviewing
+// The full cockpit for working on a repo: nvim on the right (where reviewing
 // happens too — `<leader>gv` opens diffview; `<leader>gw` picks a git worktree
 // and reviews its changes right here, so you never leave this cockpit to look
-// at an agent's worktree), lazygit on the right for staging, commits and
+// at an agent's worktree), lazygit on the left for staging, commits and
 // history, and a spare shell below it (small but always visible).
 // Fullscreen any pane with the zellij prefix then `f` (Ctrl+g, then f).
 // Everything opens on the repo (--cwd).
@@ -28,10 +28,17 @@ layout hide_floating_panes=true {
         plugin location="tab-bar"
     }
     pane split_direction="vertical" {
-        pane command="nvim" size="60%"
+        // lazygit + a spare shell on the left (IDE-style: source control docked
+        // left, editor as the main pane on the right).
         pane split_direction="horizontal" size="40%" {
             pane command="lazygit" size="75%"
             pane size="25%"    // spare shell — always visible, doesn't hide lazygit
+        }
+        // `cockpit-nvim serve` launches nvim listening on a per-repo socket so
+        // lazygit (left) can open files here and follow worktree switches.
+        // Absolute path: the zellij daemon's PATH may lack ~/.local/bin.
+        pane command="{{ .chezmoi.homeDir }}/.local/bin/cockpit-nvim" focus=true size="60%" {
+            args "serve"
         }
     }
     floating_panes {

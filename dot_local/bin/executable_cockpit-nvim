@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# cockpit-nvim — bridge lazygit (a sibling zellij pane) to the cockpit's nvim.
+#
+# All panes in a cockpit tab launch on the same repo, and every worktree of a
+# repo shares one .git common dir — so we key the nvim server socket on that.
+# lazygit and nvim compute the same path independently, and it stays stable
+# even after lazygit switches to a worktree (its cwd changes, the common dir
+# doesn't). That's what lets a lazygit-side action still find the right nvim.
+#
+# A `wt` agent tab wants the opposite: its own nvim, isolated to that one
+# worktree, not the repo-wide cockpit nvim. It sets COCKPIT_WT=1 on both its
+# lazygit and nvim, which keys the socket on the worktree's *own* --git-dir
+# (unique per worktree) instead. The cockpit sets nothing and is unaffected.
+set -euo pipefail
+
+socket() {
+  local dir flag=--git-common-dir
+  [[ -n "${COCKPIT_WT:-}" ]] && flag=--git-dir
+  dir=$(git rev-parse --path-format=absolute "$flag" 2>/dev/null) || dir="$PWD"
+  printf '%s/cockpit-nvim-%s.sock' "${TMPDIR:-/tmp}" \
+    "$(printf '%s' "$dir" | shasum | cut -c1-12)"
+}
+
+# nvim is the rightmost pane in both the cockpit and wt layouts; move-focus is a
+# no-op at the edge, so two rights land on it from any pane. No-op outside zellij.
+focus_nvim() {
+  [[ -n "${ZELLIJ:-}" ]] && command -v zellij >/dev/null || return 0
+  zellij action move-focus right >/dev/null 2>&1 || true
+  zellij action move-focus right >/dev/null 2>&1 || true
+}
+
+# Ask the running nvim to evaluate `require('cockpit').<fn>(<arg>)`. --remote-expr
+# is mode-independent (unlike --remote-send keystrokes). Paths reach the module
+# base64-encoded (see b64() callers) so nothing has to survive shell + Vimscript
+# quoting — base64's alphabet is safe unquoted.
+remote() {
+  local fn=$1 arg=$2
+  nvim --server "$sock" --remote-expr \
+    "luaeval('require\"cockpit\".${fn}(_A)', ${arg})" >/dev/null
+}
+
+b64() { printf '%s' "$1" | base64 | tr -d '\n'; }
+
+sock=$(socket)
+
+case "${1:-}" in
+  serve)
+    # Launch the listening nvim (used by the cockpit layout).
+    if [[ -S "$sock" ]] && nvim --server "$sock" --remote-expr 1 >/dev/null 2>&1; then
+      # Another cockpit already owns the shared socket for this repo; run on a
+      # private one so a second cockpit still works (lazygit targets the first).
+      exec nvim --listen "${sock%.sock}-$$.sock"
+    fi
+    rm -f "$sock"   # clear a stale socket left by a crashed nvim
+    exec nvim --listen "$sock"
+    ;;
+  open)
+    file=$2
+    line=${3:-0}
+    # lazygit's {{filename}} is relative to its cwd, which need not match nvim's
+    # (e.g. after a worktree switch) — resolve it here so nvim opens the right file.
+    [[ "$file" = /* ]] || file="$PWD/$file"
+    if [[ ! -S "$sock" ]]; then
+      # No cockpit nvim (e.g. plain `lg` in another tab): edit in place instead.
+      [[ "$line" -gt 0 ]] && exec nvim "+$line" -- "$file"
+      exec nvim -- "$file"
+    fi
+    remote open "['$(b64 "$file")', ${line}]"
+    focus_nvim
+    ;;
+  worktree)
+    # Mirror the worktree into nvim but keep focus in lazygit — unlike `open`,
+    # switching a worktree is a lazygit-side action you stay with; nvim just follows.
+    path=$2
+    [[ -S "$sock" ]] || { echo "cockpit-nvim: no cockpit nvim at $sock" >&2; exit 1; }
+    remote worktree "'$(b64 "$path")'"
+    ;;
+  *)
+    echo "usage: cockpit-nvim {serve | open <file> [line] | worktree <path>}" >&2
+    exit 1
+    ;;
+esac
