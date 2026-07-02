@@ -1,0 +1,11 @@
+// ~/.config/zellij/layouts/wt.kdl
+// Worktree agent tab, narrow-screen variant: claude full-width.
+// The `wt` shell function picks this when no wide display is attached;
+// docked to an ultrawide it uses wt-wide.kdl instead. Opens on the worktree
+// (--cwd), so claude starts already rooted there.
+layout {
+    pane size=1 borderless=true {
+        plugin location="tab-bar"
+    }
+    pane command="claude"
+}

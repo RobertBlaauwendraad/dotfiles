@@ -1,0 +1,27 @@
+// ~/.config/zellij/layouts/wt-wide.kdl
+// Worktree agent tab, wide-screen variant. claude sits centered at a fixed
+// ~140-col reading width so its (left-aligned) output lands mid-screen instead
+// of hugging the far-left edge on an ultrawide. Flanks: lazygit (browse/stage)
+// on the left, a dedicated nvim on the right to inspect the agent's changes.
+// The `wt` function picks this over wt.kdl when a >=3000px display is attached.
+// Bump the center pane's `size` to widen the agent; drop it to center tighter.
+//
+// lazygit and nvim run with COCKPIT_WT=1, which keys cockpit-nvim's socket on
+// THIS worktree's --git-dir — an nvim isolated to this tab, so lazygit's `e`
+// and its lazygit-edit:// links open here, not in the repo-wide cockpit nvim.
+// Both go via bash to set the env (zellij layouts have no per-pane env); nvim
+// uses the absolute cockpit-nvim path since the daemon PATH may lack ~/.local/bin.
+layout {
+    pane size=1 borderless=true {
+        plugin location="tab-bar"
+    }
+    pane split_direction="vertical" {
+        pane command="bash" {
+            args "-c" "COCKPIT_WT=1 exec lazygit"
+        }
+        pane command="claude" focus=true size=140
+        pane command="bash" {
+            args "-c" "COCKPIT_WT=1 exec {{ .chezmoi.homeDir }}/.local/bin/cockpit-nvim serve"
+        }
+    }
+}

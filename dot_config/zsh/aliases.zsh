@@ -45,9 +45,19 @@ wt() {
     fi
   fi
 
+  # Pick the layout by screen width: docked to a wide (>=3000px) display, center
+  # claude at a fixed reading width so it doesn't hug the far-left edge (wt-wide,
+  # flanked by lazygit + a shell); on the laptop alone, claude full-width (wt).
+  # system_profiler (~0.4s) is a proxy for "am I docked" — it sees the physical
+  # monitor, which is good enough here. No attached wide display → full-width.
+  local layout=wt
+  if system_profiler SPDisplaysDataType 2>/dev/null \
+       | awk '/Resolution:/ { if ($2 + 0 >= 3000) f = 1 } END { exit !f }'; then
+    layout=wt-wide
+  fi
+
   # Bare `new-tab --cwd` is ignored (lands in ~); pairing --cwd with a --layout
-  # makes it stick (same combo as cockpit). `default` is our normal tab template
-  # (tab-bar + pane), so the tab looks identical — just rooted at the worktree.
-  zellij action new-tab --layout default --cwd "$dir" --name "$name"
+  # makes it stick (same combo as cockpit), rooting every pane at the worktree.
+  zellij action new-tab --layout "$layout" --cwd "$dir" --name "$name"
 }
 
