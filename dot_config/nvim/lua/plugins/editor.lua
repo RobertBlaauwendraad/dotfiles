@@ -70,7 +70,7 @@ return {
       -- Compiled with the tree-sitter CLI, see Brewfile: tree-sitter-cli.
       require("nvim-treesitter").install({
         "bash", "css", "diff", "gitcommit", "go", "html", "javascript",
-        "json", "jsonc", "lua", "luadoc", "markdown", "markdown_inline",
+        "json", "lua", "luadoc", "markdown", "markdown_inline",
         "python", "query", "rust", "toml", "tsx", "typescript", "vim",
         "vimdoc", "yaml",
       })
