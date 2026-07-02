@@ -25,23 +25,25 @@ cockpit() {
 alias ck='cockpit'
 
 # Open an agent tab bound to a git worktree, creating it on first use.
-# `wt <name>` → sibling worktree <repo>-<name> on branch <name> (reusing the
-# branch if it exists, else cutting a new one off HEAD), then a zellij tab
-# cwd'd there. Re-running with the same name just reopens the tab.
+# `wt <branch>` → sibling worktree on <branch> (reusing it if it exists, else
+# cutting a new one off HEAD), then a zellij tab cwd'd there. The dir slugs the
+# full branch (/ → -) so prefixed branches never collide; the tab is named for
+# the branch's last segment. `wt feature/foo` → dir <repo>-feature-foo, tab "foo".
+# Re-running with the same branch just reopens the tab.
 wt() {
-  local name="${1:?usage: wt <name>}"
+  local branch="${1:?usage: wt <branch>  (e.g. feature/foo)}"
   [[ -n "$ZELLIJ" ]] || { echo "wt: run inside zellij (open Ghostty)" >&2; return 1; }
 
   local root
   root="$(git rev-parse --show-toplevel 2>/dev/null)" \
     || { echo "wt: not inside a git repository" >&2; return 1; }
 
-  local dir="${root:h}/${root:t}-${name}"
+  local dir="${root:h}/${root:t}-${branch//\//-}"
   if [[ ! -d "$dir" ]]; then
-    if git -C "$root" show-ref --verify --quiet "refs/heads/$name"; then
-      git -C "$root" worktree add "$dir" "$name" || return 1
+    if git -C "$root" show-ref --verify --quiet "refs/heads/$branch"; then
+      git -C "$root" worktree add "$dir" "$branch" || return 1
     else
-      git -C "$root" worktree add -b "$name" "$dir" || return 1
+      git -C "$root" worktree add -b "$branch" "$dir" || return 1
     fi
   fi
 
@@ -58,7 +60,60 @@ wt() {
 
   # Bare `new-tab --cwd` is ignored (lands in ~); pairing --cwd with a --layout
   # makes it stick (same combo as cockpit), rooting every pane at the worktree.
-  zellij action new-tab --layout "$layout" --cwd "$dir" --name "$name"
+  zellij action new-tab --layout "$layout" --cwd "$dir" --name "${branch:t}"
+}
+
+# Tear down the worktree you're standing in: drop the worktree dir and close its
+# zellij tab. The down-counterpart to `wt`. The branch is kept (its commits — and
+# any PR — outlive the worktree), so this only ever risks losing an uncommitted
+# tree; it refuses when work looks unlanded (dirty tree, or commits not yet on the
+# branch's upstream). `-f`/`--force` overrides both guards.
+unwt() {
+  [[ -n "$ZELLIJ" ]] || { echo "unwt: run inside zellij (open Ghostty)" >&2; return 1; }
+
+  local force=0
+  [[ "$1" == "-f" || "$1" == "--force" ]] && force=1
+
+  local wt_root
+  wt_root="$(git rev-parse --show-toplevel 2>/dev/null)" \
+    || { echo "unwt: not inside a git repository" >&2; return 1; }
+
+  # The main worktree is always the first entry of `worktree list`; refuse to
+  # nuke it — unwt is only for the sibling worktrees that `wt` spawns.
+  local main
+  main="$(git worktree list --porcelain | awk '/^worktree /{print $2; exit}')"
+  [[ "$wt_root" != "$main" ]] \
+    || { echo "unwt: this is the main checkout, not a wt worktree" >&2; return 1; }
+
+  local branch
+  branch="$(git -C "$wt_root" symbolic-ref --short -q HEAD)"
+
+  if (( ! force )); then
+    if [[ -n "$(git -C "$wt_root" status --porcelain)" ]]; then
+      echo "unwt: '${wt_root:t}' has uncommitted changes — commit/stash, or -f to discard" >&2
+      return 1
+    fi
+    # Commits sitting only on the local branch count as unlanded work. Compare
+    # against the upstream if one's set, else against the main worktree's branch.
+    if [[ -n "$branch" ]]; then
+      local range
+      if git -C "$wt_root" rev-parse -q --verify '@{upstream}' >/dev/null 2>&1; then
+        range='@{upstream}..HEAD'
+      else
+        range="$(git -C "$main" symbolic-ref --short -q HEAD)..HEAD"
+      fi
+      if [[ -n "$(git -C "$wt_root" rev-list "$range" 2>/dev/null)" ]]; then
+        echo "unwt: '$branch' has unlanded commits — push/merge, or -f to skip" >&2
+        return 1
+      fi
+    fi
+  fi
+
+  # Can't remove the worktree you're standing in, so hop to the main checkout
+  # first; the tab (all its panes rooted here) goes last, once the dir is gone.
+  cd "$main" || return 1
+  git worktree remove ${force:+--force} "$wt_root" || { cd "$wt_root"; return 1; }
+  zellij action close-tab
 }
 
 # Toggle desktop popups for the Claude agent-status hook. Tab markers
