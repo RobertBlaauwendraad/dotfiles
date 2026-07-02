@@ -4,7 +4,9 @@
 // of hugging the far-left edge on an ultrawide. Flanks: lazygit (browse/stage)
 // on the left, a dedicated nvim on the right to inspect the agent's changes.
 // The `wt` function picks this over wt.kdl when a >=3000px display is attached.
-// Bump the center pane's `size` to widen the agent; drop it to center tighter.
+// lazygit is pinned narrow (size=80 cols) so nvim, not lazygit, absorbs the
+// leftover width for side-by-side diffs. Bump the center pane's `size` to widen
+// the agent; drop it to center tighter.
 //
 // lazygit and nvim run with COCKPIT_WT=1, which keys cockpit-nvim's socket on
 // THIS worktree's --git-dir — an nvim isolated to this tab, so lazygit's `e`
@@ -16,7 +18,7 @@ layout {
         plugin location="tab-bar"
     }
     pane split_direction="vertical" {
-        pane command="bash" {
+        pane command="bash" size=80 {
             args "-c" "COCKPIT_WT=1 exec lazygit"
         }
         pane command="claude" focus=true size=140
