@@ -27,9 +27,19 @@ return {
       { "<leader>fr", "<cmd>Telescope oldfiles<CR>",   desc = "Recent files" },
       { "<leader>fb", "<cmd>Telescope buffers<CR>",    desc = "Buffers" },
       { "<leader>fc", "<cmd>Telescope commands<CR>",   desc = "Commands" },
+      { "<leader>gs", "<cmd>Telescope git_status<CR>", desc = "Changed files (git status)" },
     },
     config = function()
       require("telescope").setup({
+        defaults = {
+          -- Stack preview above results (divider is horizontal) so the results
+          -- list spans the full window width — long shared paths stop colliding.
+          layout_strategy = "vertical",
+          layout_config = { vertical = { preview_height = 0.5 } },
+          -- Lead each entry with its filename so results stay distinguishable
+          -- even when the dir prefix is long and identical across matches.
+          path_display = { "filename_first" },
+        },
         extensions = {
           ["ui-select"] = { require("telescope.themes").get_dropdown() },
         },
