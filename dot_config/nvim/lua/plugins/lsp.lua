@@ -1,4 +1,4 @@
-local servers = { "ts_ls", "pyright", "lua_ls", "jsonls", "cssls", "html" }
+local servers = { "ts_ls", "pyright", "gopls", "lua_ls", "jsonls", "cssls", "html" }
 
 return {
   {
