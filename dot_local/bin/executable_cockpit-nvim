@@ -41,12 +41,17 @@ remote() {
 
 b64() { printf '%s' "$1" | base64 | tr -d '\n'; }
 
+# Is a nvim actually listening on $sock? A bare `-S` check isn't enough: a clean
+# :qa removes the socket (-> we'd wrongly edit in place), a crash leaves a stale
+# one (-> connecting hangs/errors), and a reopened nvim may not be serving it.
+server_alive() { [[ -S "$sock" ]] && nvim --server "$sock" --remote-expr 1 >/dev/null 2>&1; }
+
 sock=$(socket)
 
 case "${1:-}" in
   serve)
     # Launch the listening nvim (used by the cockpit layout).
-    if [[ -S "$sock" ]] && nvim --server "$sock" --remote-expr 1 >/dev/null 2>&1; then
+    if server_alive; then
       # Another cockpit already owns the shared socket for this repo; run on a
       # private one so a second cockpit still works (lazygit targets the first).
       exec nvim --listen "${sock%.sock}-$$.sock"
@@ -60,19 +65,32 @@ case "${1:-}" in
     # lazygit's {{filename}} is relative to its cwd, which need not match nvim's
     # (e.g. after a worktree switch) — resolve it here so nvim opens the right file.
     [[ "$file" = /* ]] || file="$PWD/$file"
-    if [[ ! -S "$sock" ]]; then
-      # No cockpit nvim (e.g. plain `lg` in another tab): edit in place instead.
-      [[ "$line" -gt 0 ]] && exec nvim "+$line" -- "$file"
-      exec nvim -- "$file"
+    if server_alive; then
+      remote open "['$(b64 "$file")', ${line}]"
+      focus_nvim
+    elif [[ -n "${ZELLIJ:-}" ]] && command -v zellij >/dev/null; then
+      # No live cockpit nvim on this socket (quit, crashed, reopened without
+      # `serve`, or a plain `lg` tab). lazygit runs us with editInTerminal:false
+      # and keeps the terminal, so a full-screen `nvim` here would fight it for
+      # the tty and hang lazygit. Open in a throwaway floating pane instead — it
+      # doesn't reshape the cockpit and closes itself on :q.
+      if [[ "$line" -gt 0 ]]; then
+        zellij action new-pane --floating --close-on-exit --name edit -- nvim "+$line" -- "$file"
+      else
+        zellij action new-pane --floating --close-on-exit --name edit -- nvim -- "$file"
+      fi
+    else
+      # Not in zellij and no server: nowhere safe to take over the tty. Bail loud
+      # rather than freeze lazygit.
+      echo "cockpit-nvim: no live nvim at $sock and not in zellij" >&2
+      exit 1
     fi
-    remote open "['$(b64 "$file")', ${line}]"
-    focus_nvim
     ;;
   worktree)
     # Mirror the worktree into nvim but keep focus in lazygit — unlike `open`,
     # switching a worktree is a lazygit-side action you stay with; nvim just follows.
     path=$2
-    [[ -S "$sock" ]] || { echo "cockpit-nvim: no cockpit nvim at $sock" >&2; exit 1; }
+    server_alive || { echo "cockpit-nvim: no cockpit nvim at $sock" >&2; exit 1; }
     remote worktree "'$(b64 "$path")'"
     ;;
   *)
