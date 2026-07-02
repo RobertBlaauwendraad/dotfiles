@@ -36,17 +36,30 @@ return {
         float = { border = "rounded" },
       })
 
-      -- Rely on nvim 0.11+ built-in LSP maps: grr (references), gri
-      -- (implementation), grt (type definition), gra (code action), grn
-      -- (rename), gO (document symbols), K (hover), and [d / ]d / <C-w>d for
-      -- diagnostics. We add only what nvim leaves out.
+      -- nvim's built-in LSP navigation maps (grr/gri/grt/gO) dump into the
+      -- quickfix/loclist. Route them through Telescope instead: fuzzy list +
+      -- live preview, and it auto-jumps when there's only one result. We keep
+      -- nvim's gra (code action), grn (rename), K (hover), and [d / ]d.
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(ev)
+          local tb = require("telescope.builtin")
+          local client = vim.lsp.get_client_by_id(ev.data.client_id)
           local function m(lhs, rhs, desc)
             vim.keymap.set("n", lhs, rhs, { buffer = ev.buf, silent = true, desc = desc })
           end
-          m("gd", vim.lsp.buf.definition, "Go to definition")   -- nvim has no LSP gd
+          m("gd",  tb.lsp_definitions,       "Go to definition")   -- nvim has no LSP gd
+          m("grr", tb.lsp_references,        "References")
+          m("gO",  tb.lsp_document_symbols,  "Document symbols")
+          m("<leader>fs", tb.lsp_dynamic_workspace_symbols, "Workspace symbols")
           m("<leader>cf", function() vim.lsp.buf.format({ async = true }) end, "Format buffer")
+          -- gri/grt only where the server implements them (lua_ls/pyright/jsonls
+          -- etc. don't); otherwise nvim's default maps warn on every press.
+          if client and client:supports_method("textDocument/implementation") then
+            m("gri", tb.lsp_implementations, "Implementations")
+          end
+          if client and client:supports_method("textDocument/typeDefinition") then
+            m("grt", tb.lsp_type_definitions, "Type definition")
+          end
         end,
       })
     end,
