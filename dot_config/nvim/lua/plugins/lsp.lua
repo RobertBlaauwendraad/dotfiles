@@ -1,4 +1,19 @@
-local servers = { "ts_ls", "pyright", "gopls", "lua_ls", "jsonls", "cssls", "html" }
+local servers = { "ts_ls", "eslint", "pyright", "gopls", "lua_ls", "jsonls", "cssls", "html" }
+
+-- With no config, prettier silently reformats to its own defaults, clobbering
+-- projects that follow another style (e.g. firsty-be is eslint-only, 4-space,
+-- no prettier). So conform only runs prettier when the project opts in with a
+-- prettier config file. (Misses the rarer package.json "prettier" key and
+-- .editorconfig-only setups — acceptable; add them here if a project needs it.)
+local prettier_config = {
+  ".prettierrc", ".prettierrc.json", ".prettierrc.yml", ".prettierrc.yaml",
+  ".prettierrc.json5", ".prettierrc.js", ".prettierrc.cjs", ".prettierrc.mjs",
+  ".prettierrc.ts", ".prettierrc.toml", "prettier.config.js", "prettier.config.cjs",
+  "prettier.config.mjs", "prettier.config.ts",
+}
+local function has_prettier_config(_, ctx)
+  return #vim.fs.find(prettier_config, { path = ctx.dirname, upward = true }) > 0
+end
 
 return {
   {
@@ -13,6 +28,53 @@ return {
     config = function()
       require("mason-lspconfig").setup({ ensure_installed = servers })
     end,
+  },
+  {
+    -- mason only auto-installs LSP servers; this ensures the standalone CLI
+    -- formatters conform shells out to are present too (prettierd = a daemon
+    -- wrapping prettier, much faster on repeated format-on-save).
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    config = function()
+      require("mason-tool-installer").setup({ ensure_installed = { "prettierd" } })
+    end,
+  },
+  {
+    "stevearc/conform.nvim",
+    event = { "BufWritePre" },
+    cmd = { "ConformInfo" },
+    keys = {
+      {
+        "<leader>cf",
+        function() require("conform").format({ async = true, lsp_format = "fallback" }) end,
+        desc = "Format buffer",
+      },
+    },
+    opts = {
+      -- prettierd is a resident daemon wrapping prettier (fast repeated saves);
+      -- prettier is the fallback. Both are gated on has_prettier_config below,
+      -- so files in non-prettier projects are left untouched on save.
+      formatters = {
+        prettier  = { condition = has_prettier_config },
+        prettierd = { condition = has_prettier_config },
+      },
+      formatters_by_ft = {
+        javascript      = { "prettierd", "prettier", stop_after_first = true },
+        javascriptreact = { "prettierd", "prettier", stop_after_first = true },
+        typescript      = { "prettierd", "prettier", stop_after_first = true },
+        typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+        json            = { "prettierd", "prettier", stop_after_first = true },
+        jsonc           = { "prettierd", "prettier", stop_after_first = true },
+        css             = { "prettierd", "prettier", stop_after_first = true },
+        html            = { "prettierd", "prettier", stop_after_first = true },
+        yaml            = { "prettierd", "prettier", stop_after_first = true },
+        markdown        = { "prettierd", "prettier", stop_after_first = true },
+      },
+      -- Format on :w. No lsp_format fallback here on purpose — only the
+      -- prettier filetypes above auto-format; other filetypes stay manual
+      -- (via <leader>cf, which does fall back to the LSP formatter).
+      format_on_save = { timeout_ms = 2000 },
+    },
   },
   {
     "neovim/nvim-lspconfig",
@@ -51,7 +113,8 @@ return {
           m("grr", tb.lsp_references,        "References")
           m("gO",  tb.lsp_document_symbols,  "Document symbols")
           m("<leader>fs", tb.lsp_dynamic_workspace_symbols, "Workspace symbols")
-          m("<leader>cf", function() vim.lsp.buf.format({ async = true }) end, "Format buffer")
+          -- <leader>cf (format) is owned by conform.nvim, which prefers prettier
+          -- and falls back to the LSP formatter for other filetypes.
           -- gri/grt only where the server implements them (lua_ls/pyright/jsonls
           -- etc. don't); otherwise nvim's default maps warn on every press.
           if client and client:supports_method("textDocument/implementation") then

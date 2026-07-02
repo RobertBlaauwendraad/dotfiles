@@ -112,6 +112,16 @@ return {
     end,
   },
   {
+    -- Nothing enforces indentation in some projects (e.g. firsty-be: eslint has
+    -- no indent rule, no prettier, no .editorconfig — it's convention only). This
+    -- detects a buffer's existing indent (4-space there) and sets shiftwidth/
+    -- expandtab to match, so typed indentation follows the file, not our 2-space
+    -- defaults. .editorconfig, when present, still wins (nvim honors it natively).
+    "NMAC427/guess-indent.nvim",
+    event = { "BufReadPost", "BufNewFile" },
+    opts = {},
+  },
+  {
     "echasnovski/mini.pairs",
     config = function()
       require("mini.pairs").setup()
