@@ -24,12 +24,27 @@ cockpit() {
 }
 alias ck='cockpit'
 
-# Open an agent tab bound to a git worktree: cwd + tab name from the path.
-# e.g. `wt ../myproj-feature`
+# Open an agent tab bound to a git worktree, creating it on first use.
+# `wt <name>` → sibling worktree <repo>-<name> on branch <name> (reusing the
+# branch if it exists, else cutting a new one off HEAD), then a zellij tab
+# cwd'd there. Re-running with the same name just reopens the tab.
 wt() {
-  local dir="${1:?usage: wt <worktree-path>}"
-  [[ -d "$dir" ]] || { echo "wt: no such directory: $dir" >&2; return 1; }
+  local name="${1:?usage: wt <name>}"
   [[ -n "$ZELLIJ" ]] || { echo "wt: run inside zellij (open Ghostty)" >&2; return 1; }
-  zellij action new-tab --cwd "$dir" --name "${1:t:r}"
+
+  local root
+  root="$(git rev-parse --show-toplevel 2>/dev/null)" \
+    || { echo "wt: not inside a git repository" >&2; return 1; }
+
+  local dir="${root:h}/${root:t}-${name}"
+  if [[ ! -d "$dir" ]]; then
+    if git -C "$root" show-ref --verify --quiet "refs/heads/$name"; then
+      git -C "$root" worktree add "$dir" "$name" || return 1
+    else
+      git -C "$root" worktree add -b "$name" "$dir" || return 1
+    fi
+  fi
+
+  zellij action new-tab --cwd "$dir" --name "$name"
 }
 
