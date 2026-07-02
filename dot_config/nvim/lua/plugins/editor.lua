@@ -86,6 +86,9 @@ return {
         },
       })
 
+      vim.keymap.set("n", "]h", function() require("gitsigns").nav_hunk("next") end, { desc = "Next hunk" })
+      vim.keymap.set("n", "[h", function() require("gitsigns").nav_hunk("prev") end, { desc = "Prev hunk" })
+
       vim.keymap.set("n", "<leader>gb", ":Gitsigns blame_line<CR>", { desc = "Blame line" })
       vim.keymap.set("n", "<leader>gB", ":Gitsigns blame<CR>",      { desc = "Blame file" })
     end,
