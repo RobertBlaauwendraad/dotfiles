@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Registers user-scoped MCP servers with Claude Code.
+# MCP servers live in ~/.claude.json (mutable state chezmoi doesn't own); this
+# tracked script is the reproducible source of truth. `run_onchange_` => chezmoi
+# re-runs it whenever the list below changes. Remote servers auth via OAuth on
+# first /mcp use, so no secrets are baked in here.
+set -euo pipefail
+
+command -v claude >/dev/null 2>&1 || { echo "claude not found; skipping MCP setup"; exit 0; }
+
+# remove-then-add keeps re-runs idempotent (add fails if the name already exists)
+readd() { claude mcp remove -s user "$1" >/dev/null 2>&1 || true; }
+
+# fnm puts node on PATH only inside a shell that ran `fnm env`. Launched outside
+# one (GUI, mcp health check), npx-based servers exit 127. Wrap them so fnm's
+# stable default-node bin is appended to PATH at spawn (mirrors nvim init.lua);
+# $PATH/$HOME stay literal here so sh expands them at spawn time, not now.
+NPX='PATH="$PATH:$HOME/.local/share/fnm/aliases/default/bin" exec npx'
+
+# --- remote (HTTP) ---
+readd context7; claude mcp add -s user -t http context7 https://mcp.context7.com/mcp
+readd github;   claude mcp add -s user -t http github   https://api.githubcopilot.com/mcp/
+readd linear;   claude mcp add -s user -t http linear   https://mcp.linear.app/mcp
+
+# --- local (stdio, via npx) ---
+readd chrome-devtools;   claude mcp add -s user chrome-devtools   -- sh -c "$NPX"' -y chrome-devtools-mcp@latest'
+readd playwright;        claude mcp add -s user playwright        -- sh -c "$NPX"' -y @playwright/mcp@latest'
+readd gcp-observability; claude mcp add -s user gcp-observability -- sh -c "$NPX"' -y @google-cloud/observability-mcp'
+{{ if .work }}
+# --- work-only: Cloud SQL (Postgres) toolbox; values from chezmoi .work data ---
+readd cloud-sql-postgres; claude mcp add -s user cloud-sql-postgres \
+  -e CLOUD_SQL_POSTGRES_PROJECT={{ .work.gcpProject }} \
+  -e CLOUD_SQL_POSTGRES_REGION={{ .work.gcpRegion }} \
+  -e CLOUD_SQL_POSTGRES_INSTANCE={{ .work.gcpInstance }} \
+  -e CLOUD_SQL_POSTGRES_DATABASE={{ .work.gcpDatabase }} \
+  -- sh -c "$NPX"' -y @toolbox-sdk/server --prebuilt cloud-sql-postgres --stdio'
+{{ end }}
