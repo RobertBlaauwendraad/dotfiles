@@ -45,6 +45,9 @@ wt() {
     fi
   fi
 
-  zellij action new-tab --cwd "$dir" --name "$name"
+  # Bare `new-tab --cwd` is ignored (lands in ~); pairing --cwd with a --layout
+  # makes it stick (same combo as cockpit). `default` is our normal tab template
+  # (tab-bar + pane), so the tab looks identical — just rooted at the worktree.
+  zellij action new-tab --layout default --cwd "$dir" --name "$name"
 }
 
