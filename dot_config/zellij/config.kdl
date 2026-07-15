@@ -44,6 +44,9 @@ keybinds clear-defaults=true {
         bind "w" { CloseTab;        SwitchToMode "Normal"; }
         bind "]" { GoToNextTab;     SwitchToMode "Normal"; }
         bind "[" { GoToPreviousTab; SwitchToMode "Normal"; }
+        // Move tab: repeats like resize; Esc to finish
+        bind "}" { MoveTab "Right"; }
+        bind "{" { MoveTab "Left"; }
         bind "r" { SwitchToMode "RenameTab"; }
         bind "s" { NewTab; SwitchToMode "RenameTab"; }
 
