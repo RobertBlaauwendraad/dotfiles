@@ -1,25 +1,4 @@
 {
-  "model": "opus[1m]",
-  "alwaysThinkingEnabled": true,
-  "advisorModel": "opus",
-  "theme": "dark",
-  "tui": "fullscreen",
-  "statusLine": {
-    "type": "command",
-    "command": "bash $HOME/.claude/statusline.sh",
-    "padding": 0
-  },
-  "hooks": {
-    "UserPromptSubmit": [
-      { "hooks": [ { "type": "command", "command": "bash $HOME/.claude/hooks/agent-status.sh working" } ] }
-    ],
-    "Stop": [
-      { "hooks": [ { "type": "command", "command": "bash $HOME/.claude/hooks/agent-status.sh done" } ] }
-    ],
-    "Notification": [
-      { "hooks": [ { "type": "command", "command": "bash $HOME/.claude/hooks/agent-status.sh input" } ] }
-    ]
-  },
   "permissions": {
     "allow": [
       "Bash(chezmoi diff:*)",
@@ -39,5 +18,47 @@
       "Bash(git commit:*)",
       "Bash(git push:*)"
     ]
-  }
+  },
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/hooks/agent-status.sh working"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/hooks/agent-status.sh done"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/hooks/agent-status.sh input"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash $HOME/.claude/statusline.sh",
+    "padding": 0
+  },
+  "alwaysThinkingEnabled": true,
+  "advisorModel": "fable",
+  "tui": "fullscreen",
+  "theme": "dark",
+  "model": "claude-fable-5[1m]"
 }
