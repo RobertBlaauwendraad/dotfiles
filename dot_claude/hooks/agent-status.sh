@@ -13,7 +13,7 @@
 set -u
 
 state="${1:-}"
-[ -n "$ZELLIJ" ] || exit 0   # only meaningful inside zellij
+[ -n "${ZELLIJ:-}" ] || exit 0   # only meaningful inside zellij
 
 M_BUSY="⋯"; M_DONE="✓"; M_INPUT="?"
 
