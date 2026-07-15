@@ -36,9 +36,15 @@ zstyle ':fzf-tab:*' switch-group ',' '.'
 zinit ice wait lucid
 zinit snippet OMZP::git
 
+# fzf-tab must load before widget-wrapping plugins (autosuggestions,
+# syntax-highlighting) so they wrap its completion widget. Turbo-load
+# autosuggestions in the same wait"0" bucket (loads after fzf-tab by source
+# order); atload forces it to bind widgets on load, not at next precmd —
+# without this the wrap loses a race and Tab leaves stale suggestions behind.
 zinit ice wait lucid
 zinit light Aloxaf/fzf-tab
 
+zinit ice wait lucid atload'!_zsh_autosuggest_start'
 zinit light zsh-users/zsh-autosuggestions
 
 zinit ice wait lucid
@@ -87,6 +93,9 @@ eval "$(fzf --zsh)"
 bindkey -r '^[c'  # drop fzf's Alt+c (cd) widget — fires on Esc c with caps→esc
 if [[ -d "$HOME/.local/share/fnm" ]]; then
   eval "$(fnm env --use-on-cd --shell zsh --version-file-strategy=recursive --corepack-enabled --resolve-engines)"
+  # Activate a version at init so `node` works even when no `cd` fires use-on-cd
+  # (agents set cwd without a cd event). use-on-cd still switches per project.
+  fnm use default >/dev/null 2>&1
 fi
 
 # Aliases
@@ -95,5 +104,9 @@ fi
 # P10k config
 [[ -f ~/.p10k.zsh ]] && source ~/.p10k.zsh
 
-# zoxide — must init LAST so its `cd` hook sits on top of fnm's use-on-cd hook
-eval "$(zoxide init zsh --cmd cd)"
+# zoxide — init LAST so its `cd` hook sits atop fnm's use-on-cd hook. Decide at
+# CALL time (CLAUDECODE is set when cd runs, not when the harness sources this):
+# humans get zoxide's frecency `cd`, agents get the real builtin so a wrong path
+# errors instead of teleporting. `z`/`zi` still available for interactive jumps.
+eval "$(zoxide init zsh)"
+cd() { if [[ -n "$CLAUDECODE" ]]; then builtin cd "$@"; else z "$@"; fi }
