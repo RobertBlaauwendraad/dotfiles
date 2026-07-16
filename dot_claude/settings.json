@@ -60,5 +60,5 @@
   "advisorModel": "fable",
   "tui": "fullscreen",
   "theme": "dark",
-  "model": "claude-fable-5[1m]"
+  "model": "opus[1m]"
 }
