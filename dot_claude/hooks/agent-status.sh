@@ -4,9 +4,9 @@
 #   done     (Stop)             → "✓ <branch>"   your turn
 #   input    (Notification)     → "? <branch>"   needs input / permission
 # A background pane renames its OWN tab via `rename-tab -t <id>` (no focus
-# steal). The tab is found by branch name: `wt` names each tab after its
-# worktree branch, and git forbids one branch in two worktrees, so the match
-# is unique. Fresh/untouched tabs keep their plain name.
+# steal). The tab is found by branch name: `wt` names each tab after the last
+# segment of its worktree branch (feature/foo → "foo"), so match on that.
+# Fresh/untouched tabs keep their plain name.
 #
 # Desktop popups (needs-input / done) are opt-in and read fresh each fire:
 # `touch ~/.claude/notify-popups` to enable — see the `agent-popups` alias.
@@ -14,6 +14,7 @@ set -u
 
 state="${1:-}"
 [ -n "${ZELLIJ:-}" ] || exit 0   # only meaningful inside zellij
+[ -n "${CLAUDE_NO_TABSTATUS:-}" ] && exit 0   # secondary sessions don't own the tab marker
 
 M_BUSY="⋯"; M_DONE="✓"; M_INPUT="?"
 
@@ -23,6 +24,7 @@ cwd=$(printf '%s' "$input" | jq -r '.cwd // empty' 2>/dev/null)
 
 branch=$(git -C "$cwd" --no-optional-locks branch --show-current 2>/dev/null)
 [ -n "$branch" ] || exit 0   # detached HEAD / not a repo → nothing to mark
+branch="${branch##*/}"       # wt names tabs after the last branch segment
 
 # Find the tab whose name, stripped of any leading marker glyph, equals $branch.
 tabid=""
