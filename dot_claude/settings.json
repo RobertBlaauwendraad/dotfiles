@@ -11,7 +11,12 @@
       "Bash(chezmoi execute-template:*)",
       "Bash(go vet:*)",
       "Bash(gofmt -l:*)",
-      "Bash(zellij setup:*)"
+      "Bash(zellij setup:*)",
+      "mcp__gcp-observability__list_log_entries",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__linear__list_issues",
+      "mcp__linear__get_issue"
     ],
     "ask": [
       "Bash(chezmoi apply:*)",
