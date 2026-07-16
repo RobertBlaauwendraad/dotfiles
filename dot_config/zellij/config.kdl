@@ -32,6 +32,7 @@ keybinds clear-defaults=true {
         bind "n" { NewPane "Right"; SwitchToMode "Normal"; }
         bind "u" { NewPane "Up";    SwitchToMode "Normal"; }
         bind "d" { NewPane "Down";  SwitchToMode "Normal"; }
+        bind "s" { NewPane "stacked"; SwitchToMode "Normal"; }
         bind "x" { CloseFocus;            SwitchToMode "Normal"; }
         bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
 
@@ -48,7 +49,6 @@ keybinds clear-defaults=true {
         bind "}" { MoveTab "Right"; }
         bind "{" { MoveTab "Left"; }
         bind "r" { SwitchToMode "RenameTab"; }
-        bind "s" { NewTab; SwitchToMode "RenameTab"; }
 
         // Resize: arrows stay in Tmux mode so you can repeat; Esc to finish
         bind "Right" { Resize "Increase Right"; }
